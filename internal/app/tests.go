@@ -1,4 +1,5 @@
 package app
 
-func test() {
+func Fu() {
+
 }
