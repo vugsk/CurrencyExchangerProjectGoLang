@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/vugsk/CurrencyExchangerProjectGoLang/internal/handlers/api"
+	"github.com/vugsk/CurrencyExchangerProjectGoLang/internal/models"
 )
 
 type User1 struct {
@@ -81,6 +82,33 @@ func main() {
 				fmt.Println(err)
 			}
 			fmt.Println("ddd ", req.EmailOrLogin)
+		} else if r.Method == "POST" && r.URL.Query().Get("operation") == "sendCodeEmail" {
+			type Sdd struct {
+				Code string `json:"code"`
+			}
+			var req Sdd
+			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+				fmt.Println(err)
+			}
+			fmt.Println("ddd ", req.Code)
+
+			w.Header().Set("Access-Control-Allow-Origin", "https://localhost:4200")
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(models.ErrorResponse{
+				Code:    "USER_SUCCESS",
+				Message: "text",
+				Status:  http.StatusOK,
+			})
+		} else if r.Method == "POST" && r.URL.Query().Get("operation") == "sendNewPassword" {
+			type Sdd struct {
+				NewPassword string `json:"new_password"`
+			}
+			var req Sdd
+			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+				fmt.Println(err)
+			}
+			fmt.Println("ddd ", req.NewPassword)
 		}
 	})
 
