@@ -98,7 +98,6 @@ func main() {
 			json.NewEncoder(w).Encode(models.ErrorResponse{
 				Code:    "USER_SUCCESS",
 				Message: "text",
-				Status:  http.StatusOK,
 			})
 		} else if r.Method == "POST" && r.URL.Query().Get("operation") == "sendNewPassword" {
 			type Sdd struct {

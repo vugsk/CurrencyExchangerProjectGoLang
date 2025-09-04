@@ -9,15 +9,20 @@ import (
 	"github.com/vugsk/CurrencyExchangerProjectGoLang/internal/models"
 )
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		fmt.Println(r.Method)
-		return
-	}
+func sendError(w http.ResponseWriter, err models.ErrorResponse, status uint16) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(int(status))
+	json.NewEncoder(w).Encode(err.Message)
+}
 
+func CreateUser(w http.ResponseWriter, r *http.Request) {
 	var req models.RequestRegistration
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		fmt.Println(err)
+		var responsesError models.ErrorResponse = models.ErrorResponse{
+			Message: "Запрос не содержит необходимых данных",
+			Code:    "NO_NECESSARY_DATA",
+		}
+		sendError(w, responsesError, http.StatusBadRequest)
 		return
 	}
 
@@ -31,7 +36,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(models.ErrorResponse{
 			Message: "Пользователь с таким login уже существует",
 			Code:    "LOGIN_EXISTS",
-			Status:  http.StatusConflict,
 		})
 	}
 }
@@ -92,7 +96,6 @@ func ChekUser(w http.ResponseWriter, r *http.Request) bool {
 		json.NewEncoder(w).Encode(models.ErrorResponse{
 			Message: "Wrong password",
 			Code:    "PASSWORD_NOT_FOUND",
-			Status:  http.StatusLocked,
 		})
 		return false
 	}

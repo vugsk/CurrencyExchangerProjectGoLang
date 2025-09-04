@@ -19,7 +19,6 @@ func GetStatusUser(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(models.ErrorResponse{
 			Code:    "USER_EXISTING",
 			Message: "text",
-			Status:  http.StatusConflict,
 		})
 		return
 	}
@@ -32,7 +31,6 @@ func GetStatusUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(models.ErrorResponse{
 		Code:    "USER_SESSION_ID_VALID",
 		Message: "text",
-		Status:  http.StatusOK,
 	})
 }
 
@@ -52,6 +50,5 @@ func GetPermissionLogout(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(models.ErrorResponse{
 		Code:    "USER_SUCCESS_LOGOUT",
 		Message: "text",
-		Status:  http.StatusOK,
 	})
 }
