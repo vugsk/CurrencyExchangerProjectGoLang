@@ -9,13 +9,13 @@ import (
 	"github.com/vugsk/CurrencyExchangerProjectGoLang/internal/models"
 )
 
-func sendError(w http.ResponseWriter, err models.ErrorResponse, status uint16) {
+func sendError(w http.ResponseWriter, err models.ErrorResponse, status int) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(int(status))
+	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(err.Message)
 }
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func CreateUser(w http.ResponseWriter, r *http.Request) interface{} {
 	var req models.RequestRegistration
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		var responsesError models.ErrorResponse = models.ErrorResponse{
@@ -23,11 +23,16 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 			Code:    "NO_NECESSARY_DATA",
 		}
 		sendError(w, responsesError, http.StatusBadRequest)
-		return
+		return nil
 	}
 
 	if req.Email == "" || req.Login == "" || req.Password == "" {
-		return
+		var responsesError models.ErrorResponse = models.ErrorResponse{
+			Message: "Данные есть, но не прошли валидацию",
+			Code:    "FAILED_VALIDATION",
+		}
+		sendError(w, responsesError, http.StatusUnprocessableEntity)
+		return nil
 	}
 
 	fmt.Println(req.Email, req.Login, req.Password)
@@ -38,6 +43,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 			Code:    "LOGIN_EXISTS",
 		})
 	}
+	return req
 }
 
 func ChekUser(w http.ResponseWriter, r *http.Request) bool {

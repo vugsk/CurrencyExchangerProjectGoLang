@@ -8,6 +8,7 @@ import (
 
 	"github.com/vugsk/CurrencyExchangerProjectGoLang/internal/handlers/api"
 	"github.com/vugsk/CurrencyExchangerProjectGoLang/internal/models"
+	"github.com/vugsk/CurrencyExchangerProjectGoLang/internal/services"
 )
 
 type User1 struct {
@@ -46,6 +47,19 @@ type CreateRequestRegistrationRequest struct {
 }
 
 func main() {
+	database := services.DataBaseService{}
+
+	loginError := database.Connect("root", "admin", "databaseusers")
+	if loginError != nil {
+		return
+	}
+	defer func(database services.DataBaseService) {
+		closeError := database.Close()
+		if closeError != nil {
+			return
+		}
+	}(database)
+
 	//http.FileServer(http.Dir("C:\\Users\\nikit\\WebstormProjects\\CurrencyExchangerProjectFrontend\\dist\\CurrencyExchangerProjectFrontend\\browser"))
 	//http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 	//	// Если запрос к API, то 404
@@ -68,7 +82,10 @@ func main() {
 		if r.Method == "POST" && r.URL.Query().Get("operation") == "login" {
 			api.ChekUser(w, r)
 		} else if r.Method == "POST" && r.URL.Query().Get("operation") == "create" {
-			api.CreateUser(w, r)
+			err := database.Insert("users", api.CreateUser(w, r))
+			if err != nil {
+				return
+			}
 		} else if r.Method == "GET" && r.URL.Query().Get("operation") == "status" {
 			api.GetStatusUser(w, r)
 		} else if r.Method == "GET" && r.URL.Query().Get("operation") == "logout" {
